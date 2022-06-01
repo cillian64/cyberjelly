@@ -44,6 +44,8 @@ ripple_locs = [0] * num_tendrils
 ripples_running = False
 frames_to_ripple = 0
 
+angry = False
+
 def draw_hue_backdrop(strips):
     global hue_backdrop_increasing
     global hue_backdrop
@@ -61,6 +63,9 @@ def draw_hue_backdrop(strips):
         h = hue_backdrop + strip_idx * hue_offset_per_strip
         rgb = hsv.hsv_to_rgb(h, 1.0, 1.0)
         rgb = [int(255 * x) for x in rgb]
+        if angry:
+            rgb[0] = max(rgb[0], 128)
+            rgb[2] = 0
         strip.fill(rgb)
 
 
@@ -81,12 +86,18 @@ def draw_ripples(strips):
                 pass
             elif ripple_loc < num_segs:
                 # Work out colour of less bright trailing seg
-                trail_colour = strip[0]
-                trail_colour = tuple(min(x + 64, 255) for x in trail_colour)
+                if angry:
+                    trail_colour = (255, 64, 0)
+                else:
+                    trail_colour = strip[0]
+                    trail_colour = tuple(min(x + 64, 255) for x in trail_colour)
 
                 for i in range(6):
                     # Brightest segment
-                    strip[ripple_loc * 6 + i] = (255, 255, 255)
+                    if angry:
+                        strip[ripple_loc * 6 + i] = (255, 0, 0)
+                    else:
+                        strip[ripple_loc * 6 + i] = (255, 255, 255)
 
                 if ripple_loc >= 1:
                     for i in range(6):
@@ -103,8 +114,11 @@ def draw_ripples(strips):
             # Ripples done for this time
             ripples_running = False
 
-            # Randomise time to next ripple
-            frames_to_ripple = random.randint(140, 400)
+            # Randomise time to next ripple, unless angry
+            if not angry:
+                frames_to_ripple = random.randint(140, 400)
+            else:
+                frames_to_ripple = random.randint(10, 20)
 
     else:
         frames_to_ripple -= 1
@@ -112,11 +126,29 @@ def draw_ripples(strips):
         if frames_to_ripple <= 0:
             # Setup ripples to start again next frame
             ripples_running = True
-            ripple_locs = [random.randint(-20, 0) for _ in range(num_tendrils)]
+
+            # If angry, all ripples are synced, otherwise random
+            if angry:
+                ripple_locs = [random.randint(-2, 0) for _ in range(num_tendrils)]
+            else:
+                ripple_locs = [random.randint(-20, 0) for _ in range(num_tendrils)]
+
+
+def draw_angry(strips):
+    """Make the jellyfish angry! """
+
+    # First, make the head a red-ish colour
+    colour = strips[num_tendrils][0]
+    colour = (255, colour[1] // 4, 0)
+    strips[num_tendrils].fill(colour)
 
 
 while True:
     draw_hue_backdrop(strips)
     draw_ripples(strips)
+
+    if angry:
+        draw_angry(strips)
+
     for strip in strips:
         strip.show()
