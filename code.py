@@ -15,7 +15,7 @@ num_strands = 6
 strand_length = 114
 num_tendrils = num_strands - 1
 
-fps = 30.0  # approximate measurement
+fps = 30  # approximate measurement
 
 # Pattern constants
 # Time for the backdrop hue to ramp up and down
@@ -23,8 +23,6 @@ backdrop_ramp_time = 30.0 # seconds
 hue_offset_per_strip = 0.15 / num_strands
 backdrop_min = 0.2
 backdrop_max = 0.8 - (hue_offset_per_strip * num_strands)
-
-seconds_between_ripples = 3
 
 
 # Make the object to control the pixels
@@ -44,7 +42,7 @@ hue_backdrop_increasing = True
 # (no ripples on the head)
 ripple_locs = [0] * num_tendrils
 ripples_running = False
-frames_since_ripples = 0
+frames_to_ripple = 0
 
 def draw_hue_backdrop(strips):
     global hue_backdrop_increasing
@@ -69,7 +67,7 @@ def draw_hue_backdrop(strips):
 def draw_ripples(strips):
     global ripple_locs
     global ripples_running
-    global frames_since_ripples
+    global frames_to_ripple
 
     num_segs = strand_length // 6
 
@@ -104,14 +102,17 @@ def draw_ripples(strips):
         if ripples_done == [True] * num_tendrils:
             # Ripples done for this time
             ripples_running = False
-            frames_since_ripples = 0
+
+            # Randomise time to next ripple
+            frames_to_ripple = random.randint(140, 400)
 
     else:
-        if frames_since_ripples > fps * seconds_between_ripples:
+        frames_to_ripple -= 1
+
+        if frames_to_ripple <= 0:
             # Setup ripples to start again next frame
             ripples_running = True
-            ripple_locs = [-5, -10, -15, -20, -25]
-        frames_since_ripples += 1
+            ripple_locs = [random.randint(-20, 0) for _ in range(num_tendrils)]
 
 
 while True:
