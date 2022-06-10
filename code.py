@@ -1,6 +1,8 @@
-# SPDX-FileCopyrightText: 2021 Jeff Epler for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
+# Cyberjelly control code
+# Copyright (c) 2022 David Turner
+# This work is free. You can redistribute it and/or modify it under the
+# terms of the Do What The Fuck You Want To Public License, Version 2,
+# as published by Sam Hocevar. See the LICENSE file for more details.
 
 import random
 import board
@@ -19,7 +21,7 @@ fps = 30  # approximate measurement
 
 # Pattern constants
 # Time for the backdrop hue to ramp up and down
-backdrop_ramp_time = 30.0 # seconds
+backdrop_ramp_time = 30.0  # seconds
 hue_offset_per_strip = 0.15 / num_strands
 backdrop_min = 0.2
 backdrop_max = 0.8 - (hue_offset_per_strip * num_strands)
@@ -27,11 +29,11 @@ backdrop_max = 0.8 - (hue_offset_per_strip * num_strands)
 
 # Make the object to control the pixels
 pixels = NeoPIO(board.GP0, board.GP1, board.GP2, num_strands*strand_length,
-    num_strands=num_strands, auto_write=False, brightness=1)
+                num_strands=num_strands, auto_write=False, brightness=1)
 
 # Make a virtual PixelMap so that each strip can be controlled independently
-strips = [PixelMap(pixels, range(i*strand_length, (i+1)*strand_length), individual_pixels=True)
-    for i in range(num_strands)]
+strips = [PixelMap(pixels, range(i*strand_length, (i+1)*strand_length),
+                   individual_pixels=True) for i in range(num_strands)]
 
 # State for the pattern
 # Ranges between 0.2 and 0.6 going back and forth in a sawtooth
@@ -43,6 +45,7 @@ hue_backdrop_increasing = True
 ripple_locs = [0] * num_tendrils
 ripples_running = False
 frames_to_ripple = 0
+
 
 def draw_hue_backdrop(strips):
     global hue_backdrop_increasing
@@ -64,7 +67,7 @@ def draw_hue_backdrop(strips):
         strip.fill(rgb)
 
 
-def draw_ripples(strips):
+def draw_ripples(strips):  # noqa: disable C901
     global ripple_locs
     global ripples_running
     global frames_to_ripple
