@@ -1,0 +1,3 @@
+[submodule "mini_jellies/RP_Silicon_KiCad"]
+	path = mini_jellies/RP_Silicon_KiCad
+	url = https://github.com/HeadBoffin/RP_Silicon_KiCad.git
