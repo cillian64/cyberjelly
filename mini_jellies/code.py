@@ -20,7 +20,7 @@ strand_length = 30  # Number of pixels per strand
 brightness = 0.8  # Between 0.0 and 1.0
 
 num_tentacles = num_strands - 1
-fps = 30  # Approximate measurement, used for timing
+fps = 60  # Approximate measurement, used for timing
 
 # Pattern constants
 # Time for the backdrop hue to ramp up and down
@@ -100,16 +100,13 @@ def draw_ripples(strips):  # noqa: disable C901
                 trail_colour = strip[0]
                 trail_colour = tuple(min(x + 64, 255) for x in trail_colour)
 
-                for i in range(6):
-                    # Brightest segment
-                    strip[ripple_loc * 6 + i] = (255, 255, 255)
+                # Brightest segment
+                strip[ripple_loc] = (255, 255, 255)
 
                 if ripple_loc >= 1:
-                    for i in range(6):
-                        strip[(ripple_loc - 1) * 6 + i] = trail_colour
+                    strip[ripple_loc - 1] = trail_colour
                 if ripple_loc <= num_segs - 2:
-                    for i in range(6):
-                        strip[(ripple_loc + 1) * 6 + i] = trail_colour
+                    strip[ripple_loc + 1] = trail_colour
             else:
                 ripples_done[strip_idx] = True
 
