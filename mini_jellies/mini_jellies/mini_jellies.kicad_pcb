@@ -740,6 +740,11 @@
       (net 50 "unconnected-(U2-Pad43)") (pinfunction "SWDIO") (pintype "bidirectional+no_connect") (tstamp 4f58baa9-ed01-4835-9812-105c1dd9f170))
     (pad "43" thru_hole oval (at 2.54 23.9 180) (size 1.7 1.7) (drill 1.02) (layers *.Cu *.Mask)
       (net 50 "unconnected-(U2-Pad43)") (pinfunction "SWDIO") (pintype "bidirectional+no_connect") (tstamp c32d1086-cbb6-4371-b578-d340b6849bd7))
+    (model "${KIPRJMOD}/models/Pico-R3.step"
+      (offset (xyz -10.5 -25.5 5))
+      (scale (xyz 1 1 1))
+      (rotate (xyz -90 0 0))
+    )
   )
 
   (footprint "Connector_Molex:Molex_KK-254_AE-6410-03A_1x03_P2.54mm_Vertical" (layer "F.Cu")
