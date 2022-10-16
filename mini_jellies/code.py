@@ -12,15 +12,32 @@ from adafruit_led_animation.helper import PixelMap
 from neopio import NeoPIO
 
 
-# Customize for your strands here.  The tentacles should be connected to the
-# first `num_strands - 1` outputs, while the final output is connected to the
-# LED strip inside the jellyfish's head.
-num_strands = 6  # Number of LED strands, including tentacles and head
-strand_length = 30  # Number of pixels per strand
-brightness = 0.8  # Between 0.0 and 1.0
+# --- Customize for your strands here ---
 
+# Number of LED strands, including tentacles and head
+num_strands = 6
+
+# Number of pixels per strand
+strand_length = 30
+
+# Brightness ranges from 0.0 to 1.0.  0.75 gives an average current consumption
+# of 2.5A per jellyfish with cheap eBay WS2812b strip
+brightness = 0.75  # Between 0.0 and 1.0
+
+# The tentacles should be connected to the first `num_strands - 1` outputs,
+# while the final output is connected to the LED strip inside the jellyfish's
+# head.
 num_tentacles = num_strands - 1
-fps = 60  # Approximate measurement, used for timing
+
+# The code runs as fast as possible without any delays (yeh, I know this isn't
+# the best way to do it, most of this code was written in the dark in a field).
+# This value is used to adjust how quickly the base hue fades and how often
+# ripples are started.  Making the value larger makes the fading/ripples
+# slower.  The movement of the ripples down the strands is not affected by this
+# value, they always move at one segment per frame.
+fps = 120
+
+# --- End customisation ---
 
 # Pattern constants
 # Time for the backdrop hue to ramp up and down
@@ -31,7 +48,8 @@ backdrop_max = 0.8 - (hue_offset_per_strip * num_strands)
 
 # Make the object to control the pixels
 pixels = NeoPIO(board.GP0, board.GP1, board.GP2, num_strands*strand_length,
-                num_strands=num_strands, auto_write=False, brightness=1)
+                num_strands=num_strands, auto_write=False,
+                brightness=brightness)
 
 # Make a virtual PixelMap so that each strip can be controlled independently
 strips = [PixelMap(pixels, range(i*strand_length, (i+1)*strand_length),
@@ -117,7 +135,7 @@ def draw_ripples(strips):  # noqa: disable C901
             ripples_running = False
 
             # Randomise time to next ripple
-            frames_to_ripple = random.randint(140, 400)
+            frames_to_ripple = random.randint(140, 400) * (fps / 30.0)
 
     else:
         frames_to_ripple -= 1
