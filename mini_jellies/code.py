@@ -20,9 +20,11 @@ num_strands = 6
 # Number of pixels per strand
 strand_length = 30
 
-# Brightness ranges from 0.0 to 1.0.  0.75 gives an average current consumption
-# of 2.5A per jellyfish with cheap eBay WS2812b strip
-brightness = 0.75  # Between 0.0 and 1.0
+# Brightnesses range from 0.0 to 1.0.  Tentacle and head brightnesses are both
+# multiplied by the global brightness.
+global_brightness = 1.0
+tentacle_brightness = 0.5
+head_brightness = 1.0
 
 # The tentacles should be connected to the first `num_strands - 1` outputs,
 # while the final output is connected to the LED strip inside the jellyfish's
@@ -49,7 +51,7 @@ backdrop_max = 0.8 - (hue_offset_per_strip * num_strands)
 # Make the object to control the pixels
 pixels = NeoPIO(board.GP0, board.GP1, board.GP2, num_strands*strand_length,
                 num_strands=num_strands, auto_write=False,
-                brightness=brightness)
+                brightness=global_brightness)
 
 # Make a virtual PixelMap so that each strip can be controlled independently
 strips = [PixelMap(pixels, range(i*strand_length, (i+1)*strand_length),
@@ -84,8 +86,12 @@ def draw_hue_backdrop(strips):
             hue_backdrop_increasing = True
 
     for (strip_idx, strip) in enumerate(strips):
+        # Use separate brightnesses for head and tentacles
+        head = strip_idx == len(strips) - 1
+        value = head_brightness if head else tentacle_brightness
+
         h = hue_backdrop + strip_idx * hue_offset_per_strip
-        rgb = hsv.hsv_to_rgb(h, 1.0, 1.0)
+        rgb = hsv.hsv_to_rgb(h, 1.0, value)
         rgb = [int(255 * x) for x in rgb]
         strip.fill(rgb)
 
